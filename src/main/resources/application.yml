@@ -12,7 +12,7 @@ server:
 spring:
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://localhost:3306/test
+    url: jdbc:mariadb://localhost:3306/date
     username: root
     password: root
 #    password: P@ssw0rd!
@@ -25,4 +25,8 @@ spring:
     cache: false
 ---
 
+mybatis:
+  type-aliases-package: com.mat.date.model
+  mapper-locations: mybatis/**/*Mapper.xml
+---
 
