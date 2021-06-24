@@ -1,8 +1,8 @@
 server:
   ssl:
     enabled: true
-#    key-store: keystore.p12
-    key-store: /home/opc/SSL/keystore.p12
+    key-store: keystore.p12
+#    key-store: /home/opc/SSL/keystore.p12
     key-store-password: 156423
     key-store-type: PKCS12
     key-alias: bns-ssl
@@ -14,18 +14,15 @@ spring:
     driver-class-name: org.mariadb.jdbc.Driver
     url: jdbc:mariadb://localhost:3306/test
     username: root
-#    password: root
-    password: P@ssw0rd!
+    password: root
+#    password: P@ssw0rd!
 
   devtools:
     livereload:
       enabled: true
 
   thymeleaf:
-    prefix: classpath:/templates/views/
-    suffix: .html
     cache: false
-    check-template-location: true
 ---
 
 
