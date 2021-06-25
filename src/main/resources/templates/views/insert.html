@@ -1,26 +1,46 @@
 <!DOCTYPE html>
-<html lang="kr" xmlns:th="http://thymeleaf.org">
+<html lang="kr" xmlns:th="http://www.thymeleaf.org">
 <title>Date :: 추가</title>
 <style>
     label {
         margin-top: 0.5rem;
+    }
+    .tag {
+        font-size: 11px;
+        margin: 5px;
+        color: #2086f4;
+        display: flex;
+        flex-direction: column;
+        display: none;
+    }
+    .tag ul {
+        list-style-type: none;
+    }
+    #categoryBtn {
+        cursor: pointer;
     }
 </style>
 <th:block th:replace="~{/layout/commons :: setContent(~{this :: content})}">
     <th:block th:fragment="content">
         <div class="main">
             <form>
-                <label>테스트 입력</label>
-                <input type="text" class="form-control" placeholder="테스트 입력">
-                <label>테스트 입력</label>
-                <input type="text" class="form-control" placeholder="테스트 입력">
-                <label>테스트 입력</label>
-                <input type="text" class="form-control" placeholder="테스트 입력">
+                <label>날짜</label>
+                <input type="text" class="form-control" readonly th:value="${getDate}">
                 <div id="mapmask"
-                     style="background-color: rgba(0, 0, 0, 0.5); position: absolute; margin-top: 4%; height: 300px; width: 300px; z-index: 5;">
+                     style="background-color: rgba(0, 0, 0, 0.5); position: absolute; margin-top: 15px; height: 300px; width: 300px; z-index: 5;">
                     <span style="color:white; font-weight: bold; font-size: 18px; line-height: 250px;">위치를 이동시키려면 터치해 주세요.</span>
                 </div>
                 <div id="map" style="width: 300px; height: 300px; margin-top: 5%; margin-bottom: 5%; border: 1px solid lightgray;"></div>
+                <label>테스트 입력</label>
+                <input type="text" class="form-control" placeholder="테스트 입력">
+                <label>카테고리 <span id="categoryBtn">▲</span></label>
+                <div class="tag">
+                    <ul>
+                        <li th:each="list : ${categoryList}" style="margin: 5px;">
+                            <input type="checkbox" class="form-select-button tag-nav" th:value="${list.get('category_id')}" th:text="' #' + ${list.get('category_name')}">
+                        </li>
+                    </ul>
+                </div>
             </form>
         </div>
         <script>
@@ -48,6 +68,17 @@
                         };
                     map = new kakao.maps.Map(mapContainer, mapOption);
                 }
+
+                $('#categoryBtn').on('click', function () {
+                    if ($(this).text() === '▲') {
+                        $(this).text('▼');
+                        $('.tag').fadeToggle();
+                    } else {
+                        $(this).text('▲');
+                        $('.tag').fadeToggle();
+                    }
+                });
+                console.log($('#categoryBtn').text());
             });
         </script>
     </th:block>
