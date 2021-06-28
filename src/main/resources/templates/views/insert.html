@@ -5,6 +5,7 @@
     label {
         margin-top: 0.5rem;
     }
+
     .tag {
         font-size: 11px;
         margin: 5px;
@@ -13,42 +14,131 @@
         flex-direction: column;
         display: none;
     }
+
     .tag ul {
         list-style-type: none;
     }
+
     #categoryBtn {
         cursor: pointer;
+    }
+
+    #select_img {
+        margin-top: 3%;
+        display: none;
+    }
+
+    .carousel-inner img {
+        width: 100% !important;
+        height: 250px !important;
+    }
+
+    .MultiFile-list {
+        font-size: 12px;
+        margin-left: 15px;
+        margin-top: 15px;
     }
 </style>
 <th:block th:replace="~{/layout/commons :: setContent(~{this :: content})}">
     <th:block th:fragment="content">
-        <div class="main">
+        <div class="main container">
             <form>
                 <label>날짜</label>
-                <input type="text" class="form-control" readonly th:value="${getDate}">
+                <input type="text" class="form-control" name="date" readonly th:value="${getDate}">
+                <button class="btn btn-info searchPlaceBtn" style="margin-top: 10px; width: 100%;"><i class="fa fa-search"></i> 장소 검색</button>
                 <div id="mapmask"
-                     style="background-color: rgba(0, 0, 0, 0.5); position: absolute; margin-top: 15px; height: 300px; width: 300px; z-index: 5;">
-                    <span style="color:white; font-weight: bold; font-size: 18px; line-height: 250px;">위치를 이동시키려면 터치해 주세요.</span>
+                     style="position: absolute; margin-top: 15px; height: 200px; width: 100%; z-index: 5;">
                 </div>
-                <div id="map" style="width: 300px; height: 300px; margin-top: 5%; margin-bottom: 5%; border: 1px solid lightgray;"></div>
-                <label>테스트 입력</label>
-                <input type="text" class="form-control" placeholder="테스트 입력">
+                <div id="map"
+                     style="width: 100%; height: 200px; margin-top: 5%; margin-bottom: 5%; border: 1px solid lightgray;"></div>
+                <input type="hidden" name="place">
+                <input type="hidden" name="date_lat">
+                <input type="hidden" name="date_lon">
+                <label>사진첨부</label>
+                <div style="margin-top: -5px; margin-bottom: 5px;">
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" multiple="multiple" name="pictures"
+                               id="upload_img">
+                        <label class="custom-file-label">사진첨부</label>
+                    </div>
+                    <div id="select_img" class="carousel slide form-group" data-interval="false">
+                        <!-- Indicators -->
+                        <ol class="carousel-indicators"></ol>
+                        <!-- Wrapper for slides -->
+                        <div class="carousel-inner" role="listbox"></div>
+                        <!-- Controls -->
+                        <a class="carousel-control-prev" href="#select_img" data-slide="prev">
+                            <span class="carousel-control-prev-icon"></span>
+                        </a>
+                        <a class="carousel-control-next" href="#select_img" data-slide="next">
+                            <span class="carousel-control-next-icon"></span>
+                        </a>
+                    </div>
+                </div>
+                <label>메모</label>
+                <textarea class="form-control" rows="3" name="memo" maxlength="500" style="font-size: 11px;"></textarea>
                 <label>카테고리 <span id="categoryBtn">▲</span></label>
                 <div class="tag">
                     <ul>
                         <li th:each="list : ${categoryList}" style="margin: 5px;">
-                            <input type="checkbox" class="form-select-button tag-nav" th:value="${list.get('category_id')}" th:text="' #' + ${list.get('category_name')}">
+                            <input type="checkbox" class="form-select-button tag-nav"
+                                   th:value="${list.get('category_id')}" th:text="' #' + ${list.get('category_name')}">
                         </li>
                     </ul>
                 </div>
             </form>
+            <div class="modal fade" id="placeModal" role="dialog">
+                <div class="modal-dialog">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">×</button>
+                        </div>
+                        <div class="modal-body">
+                            <ul class="list-group">
+                            </ul>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn btn-lg btn-info"><i class="fa fa-list" aria-hidden="true"></i> 취소</button>
+                <button class="btn btn-lg btn-success"><i class="fa fa-check-circle"></i> 등록</button>
+            </div>
         </div>
         <script>
+            let places;
             $(() => {
-
                 let lat;
                 let lon;
                 let map;
+                let ps;
+                let marker;
+                let markerImage = new kakao.maps.MarkerImage('images/marker.png', new kakao.maps.Size(24, 24));
+                let file = [];
+                let resizeImage = [];
+
+                $('#upload_img').MultiFile({
+                    accept: 'jpg|jpeg|png|gif|bmp|heic', //업로드 허용 확장자
+                    STRING: { //해당 이슈 알럿 띄우는 메서드
+                        denied: "$ext 는(은) 업로드 할 수 없는 파일 확장자 입니다.",
+                    },
+                    // 파일 리스트에서 파일 삭제를 눌렀을 경우 호출되는 메서드
+                    onFileRemove: function (element, value, master_element) {
+                        for (let i = 0; i < file.length; i++) {
+                            //파일 삭제시 파일 배열에서 해당하는 파일 객체 삭제
+                            if (file[i].name == value) {
+                                file.splice(i, 1);
+                                resizeImage.splice(i, 1);
+                            }
+                        }
+                        //배열 자르기 완료후 change 이벤트 강제 실행 trigger
+                        $('#upload_img').trigger('change');
+                    }
+                });
 
                 if (!!navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
@@ -56,6 +146,7 @@
 
                 function errorCallback(err) {
                     alert(err + '\n이 브라우저는 Geolocation을 지원하지 않습니다');
+                    return location.href = 'index';
                 }
 
                 function successCallback(position) {
@@ -67,6 +158,7 @@
                             center: new kakao.maps.LatLng(lat, lon)
                         };
                     map = new kakao.maps.Map(mapContainer, mapOption);
+                    ps = new kakao.maps.services.Places();
                 }
 
                 $('#categoryBtn').on('click', function () {
@@ -78,8 +170,177 @@
                         $('.tag').fadeToggle();
                     }
                 });
-                console.log($('#categoryBtn').text());
+
+                $('.searchPlaceBtn').on('click', (e) => {
+                    e.preventDefault();
+                    let keyword = prompt('검색할 장소를 입력하세요');
+                    if (ps != null) {
+                        if (keyword != null) {
+                            if (!keyword.replace(/^\s+|\s+$/g, '')) {
+                                alert('키워드를 입력해주세요');
+                                return false;
+                            }
+                            ps.keywordSearch(keyword, placeSearchCB);
+                        }
+                    }
+                });
+
+                $('.list-group').on('click', '.list-group-item', function () {
+                    let idx = $(this).index();
+                    let getPlace = places[idx];
+                    if (marker != null) {
+                        marker.setMap(null);
+                    }
+                    $('#placeModal').modal('hide');
+                    let markerPostion = new kakao.maps.LatLng(getPlace.y, getPlace.x);
+                    marker = new kakao.maps.Marker({
+                        position: markerPostion,
+                        image: markerImage
+                    });
+                    marker.setMap(map);
+                    map.setCenter(markerPostion);
+                    $('input[name=place]').val(getPlace.place_name);
+                    $('input[name=date_lat]').val(getPlace.y);
+                    $('input[name=date_lon]').val(getPlace.x);
+                });
+
+                $('#upload_img').on('change', (e) => {
+                    files = e.target.files; //파일 태그에서 파일 선택시 e : fileList에 현재 선택된 파일이 선택
+                    //이벤트 실행시 캐러셀 아이템들 지우기
+                    $('.carousel-inner').empty();
+                    $('.carousel-indicators').empty();
+
+                    if (files != null) {
+                        for (let item of files) {
+                            file.push(item);
+                        }
+                    }
+
+                    //each 문으로 files 배열 인덱스마다 로직 실행
+                    fileProcess();
+
+                    //파일이 들어있지 않으면 이미지 영역을 숨기기
+                    if (file.length == 0) {
+                        $('#select_img').hide();
+                    } else {
+                        $('#select_img').show();
+                    }
+
+                    //이미지 슬라이드 동적 추가 반드시 active 초기값을 넣어줘야 함
+                    for (let i = 0; i < file.length; i++) {
+                        //img 속성의 tabindex = "0" 지정 해줘야 focus가 먹힘
+                        $('<div class=\"carousel-item\"><img src="' + URL.createObjectURL(file[i]) + '" tabindex="0"></div>').appendTo('.carousel-inner');
+                        $('<li data-target="#upload_img" data-slide-to="' + i + '"></li>').appendTo('.carousel-indicators');
+
+                    }
+
+                    $('.carousel-item').last().addClass('active');
+                    $('.carousel-indicators > li').last().addClass('active');
+                    $('#select_img').carousel();
+                    $('#select_img img').focus();
+
+                });
             });
+
+            function placeSearchCB(data, status) {
+                if (status === kakao.maps.services.Status.OK) {
+                    displayPlaces(data);
+                    places = data;
+                } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
+                    alert('검색 결과가 존재하지 않습니다.');
+                    return;
+                } else if (status === kakao.maps.services.Status.ERROR) {
+                    alert('검색 결과 중 오류가 발생했습니다.');
+                    return;
+                }
+            }
+
+            function displayPlaces(places) {
+                $('.list-group-item').remove();
+                for (let place of places) {
+                    $('.list-group').append('<li class="list-group-item"><div>' + place.place_name + '</div><div style="font-size: 11px;">' + (place.road_address_name === '' ? place.address_name : place.road_address_name) + '</div><div style="font-size: 11px; color: #2086f4">' + place.phone + '</div></li>');
+                }
+                $('#placeModal').modal();
+            }
+
+            //html5 canvas 생성
+            function resize_image(image) {
+                let canvas = document.createElement("canvas"),
+                    width = image.width,
+                    height = image.height,
+                    max_size = 1280;
+                if (width > height) {
+                    // 가로가 길 경우
+                    if (width > max_size) {
+                        height *= max_size / width;
+                        width = max_size;
+                    }
+                } else {
+                    // 세로가 길 경우
+                    if (height > max_size) {
+                        width *= max_size / height;
+                        height = max_size;
+                    }
+                }
+                canvas.width = width;
+                canvas.height = height;
+                canvas.getContext("2d").drawImage(image, 0, 0, width, height);
+
+                //jpeg로 이미지 압축
+                let dataUrl = canvas.toDataURL("image/jpeg");
+                return dataUrl;
+            }
+
+            function fileProcess() {
+                $.each(files, function (i, f) {
+
+                    //FileReader를 이용하여 비동기식으로 File을 읽음
+                    let reader = new FileReader();
+
+                    //File 읽었을때 실행 메서드
+                    reader.onload = function (readerEvent) {
+                        let image = new Image();
+                        image.src = readerEvent.target.result;
+                        image.onload = function (imageEvent) {
+
+                            let url = resize_image(image);
+                            let getBlob = dataURLToBlob(url);
+                            resizeImage.push(getBlob);
+                        }
+                    }
+                    reader.readAsDataURL(f);
+                });
+            }
+
+            const dataURLToBlob = function (dataURL) {
+                const BASE64_MARKER = ";base64,";
+
+                // base64로 인코딩 되어있지 않을 경우
+                if (dataURL.indexOf(BASE64_MARKER) === -1) {
+                    const parts = dataURL.split(",");
+                    const contentType = parts[0].split(":")[1];
+                    const raw = parts[1];
+                    return new Blob([raw], {
+                        type: contentType
+                    });
+                }
+                // base64로 인코딩 된 이진데이터일 경우
+                const parts = dataURL.split(BASE64_MARKER);
+                const contentType = parts[0].split(":")[1];
+                const raw = window.atob(parts[1]);
+                // atob()는 Base64를 디코딩하는 메서드
+                const rawLength = raw.length;
+                // 부호 없는 1byte 정수 배열을 생성
+                const uInt8Array = new Uint8Array(rawLength); // 길이만 지정된 배열
+                let i = 0;
+                while (i < rawLength) {
+                    uInt8Array[i] = raw.charCodeAt(i);
+                    i++;
+                }
+                return new Blob([uInt8Array], {
+                    type: contentType
+                });
+            }
         </script>
     </th:block>
 </th:block>
