@@ -5,7 +5,6 @@
     label {
         margin-top: 0.5rem;
     }
-
     .tag {
         font-size: 11px;
         margin: 5px;
@@ -14,25 +13,20 @@
         flex-direction: column;
         display: none;
     }
-
     .tag ul {
         list-style-type: none;
     }
-
     #categoryBtn {
         cursor: pointer;
     }
-
     #select_img {
         margin-top: 3%;
         display: none;
     }
-
     .carousel-inner img {
         width: 100% !important;
         height: 250px !important;
     }
-
     .MultiFile-list {
         font-size: 12px;
         margin-left: 15px;
@@ -47,7 +41,7 @@
                 <input type="text" class="form-control" name="date" readonly th:value="${getDate}">
                 <button class="btn btn-info searchPlaceBtn" style="margin-top: 10px; width: 100%;"><i class="fa fa-search"></i> 장소 검색</button>
                 <div id="mapmask"
-                     style="position: absolute; margin-top: 15px; height: 200px; width: 100%; z-index: 5;">
+                     style="position: absolute; margin-top: 15px; z-index: 5;">
                 </div>
                 <div id="map"
                      style="width: 100%; height: 200px; margin-top: 5%; margin-bottom: 5%; border: 1px solid lightgray;"></div>
@@ -105,7 +99,7 @@
                 </div>
             </div>
             <div style="text-align: center; margin-top: 20px;">
-                <button class="btn btn-lg btn-info"><i class="fa fa-list" aria-hidden="true"></i> 취소</button>
+                <button class="btn btn-lg btn-info" onclick="location.href='index'"><i class="fa fa-list" aria-hidden="true"></i> 취소</button>
                 <button class="btn btn-lg btn-success"><i class="fa fa-check-circle"></i> 등록</button>
             </div>
         </div>
@@ -120,6 +114,12 @@
                 let markerImage = new kakao.maps.MarkerImage('images/marker.png', new kakao.maps.Size(24, 24));
                 let file = [];
                 let resizeImage = [];
+
+                $('#mapmask').width($('#map').width());
+                $('#mapmask').height($('#map').height());
+                $('#mapmask').on('click', () => {
+                    $('#mapmask').hide();
+                });
 
                 $('#upload_img').MultiFile({
                     accept: 'jpg|jpeg|png|gif|bmp|heic', //업로드 허용 확장자
