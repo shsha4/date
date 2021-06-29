@@ -29,6 +29,7 @@ spring:
       max-file-size: 10MB
       max-request-size: 30MB
       location: 'C:\IntelliJ_WorkSpace\date\src\main\resources\static\uploadImages'
+#      location: '/home/opc/uploadImages'
 ---
 
 mybatis:
