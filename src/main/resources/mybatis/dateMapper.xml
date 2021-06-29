@@ -4,4 +4,40 @@
     <select id="getCategoryMaster" resultType="hashmap">
         SELECT * FROM m_category;
     </select>
+    <insert id="insertSchedule" parameterType="ScheduleDTO">
+        INSERT INTO
+            schedule(
+                     date,
+                     place,
+                     date_lat,
+                     date_lon,
+                     memo)
+            VALUE(
+                #{date},
+                #{place},
+                #{date_lat},
+                #{date_lon},
+                #{memo}
+            );
+    </insert>
+    <insert id="insertPictures" parameterType="ScheduleDTO">
+        INSERT INTO
+            pictures(idx, picture, upload_date)
+        VALUES
+            <foreach collection="imgs" item="item" separator=",">(#{idx}, #{item}, now())</foreach>;
+    </insert>
+    <insert id="insertCategories" parameterType="ScheduleDTO">
+        INSERT INTO
+            plural_category(idx, category_id)
+        VALUES
+            <foreach collection="categories" item="item" separator=",">(#{idx}, #{item})</foreach>;
+    </insert>
+    <select id="getIndexSchedule" parameterType="ScheduleDTO" resultType="int">
+        SELECT idx FROM schedule
+        WHERE date = #{date} AND place = #{place};
+    </select>
+    <select id="getDateList" parameterType="String" resultType="ScheduleDTO">
+        SELECT * FROM schedule
+        WHERE date LIKE CONCAT(#{target_date}, '%');
+    </select>
 </mapper>

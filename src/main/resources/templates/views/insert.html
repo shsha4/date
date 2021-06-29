@@ -32,11 +32,15 @@
         margin-left: 15px;
         margin-top: 15px;
     }
+    .MultiFile-remove {
+        font-size: 15px;
+        color: #D13E3E;
+    }
 </style>
 <th:block th:replace="~{/layout/commons :: setContent(~{this :: content})}">
     <th:block th:fragment="content">
         <div class="main container">
-            <form>
+            <form class="mainForm" enctype="multipart/form-data">
                 <label>날짜</label>
                 <input type="text" class="form-control" name="date" readonly th:value="${getDate}">
                 <button class="btn btn-info searchPlaceBtn" style="margin-top: 10px; width: 100%;"><i class="fa fa-search"></i> 장소 검색</button>
@@ -75,7 +79,7 @@
                 <div class="tag">
                     <ul>
                         <li th:each="list : ${categoryList}" style="margin: 5px;">
-                            <input type="checkbox" class="form-select-button tag-nav"
+                            <input type="checkbox" class="form-select-button tag-nav" name="categories"
                                    th:value="${list.get('category_id')}" th:text="' #' + ${list.get('category_name')}">
                         </li>
                     </ul>
@@ -100,11 +104,14 @@
             </div>
             <div style="text-align: center; margin-top: 20px;">
                 <button class="btn btn-lg btn-info" onclick="location.href='index'"><i class="fa fa-list" aria-hidden="true"></i> 취소</button>
-                <button class="btn btn-lg btn-success"><i class="fa fa-check-circle"></i> 등록</button>
+                <button class="btn btn-lg btn-success insertBtn"><i class="fa fa-check-circle"></i> 등록</button>
             </div>
         </div>
         <script>
             let places;
+            let file = [];
+            let resizeImage = [];
+
             $(() => {
                 let lat;
                 let lon;
@@ -112,8 +119,6 @@
                 let ps;
                 let marker;
                 let markerImage = new kakao.maps.MarkerImage('images/marker.png', new kakao.maps.Size(24, 24));
-                let file = [];
-                let resizeImage = [];
 
                 $('#mapmask').width($('#map').width());
                 $('#mapmask').height($('#map').height());
@@ -239,6 +244,36 @@
                     $('#select_img').carousel();
                     $('#select_img img').focus();
 
+                });
+
+                $('.insertBtn').on('click', function (e) {
+                    e.preventDefault();
+
+                    if($('input[name=place]').val() != '') {
+                        let formData = new FormData($('.mainForm')[0]);
+                        let categories = [];
+
+                        if (resizeImage != null) {
+                            resizeImage.forEach((img) => {
+                                formData.append('files', img);
+                            });
+                        }
+
+                        $.ajax({
+                            url: 'insert.do',
+                            type: 'post',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            success : (result) => {
+                                if(result) {
+                                    location.href = 'index';
+                                }
+                            }
+                        });
+                    } else {
+                        alert('장소를 검색해 주세요!');
+                    }
                 });
             });
 

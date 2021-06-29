@@ -200,6 +200,7 @@ $RECYCLE.BIN/
 /build/classes/java/test/
 
 .idea
+src/main/resources/static/uploadImages
 
 #local test ssl keystore
 keystore.p12

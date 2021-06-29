@@ -83,6 +83,13 @@
         transform: translate(-50%, -50%);
         content: '';
     }
+    .met {
+        width: 20px;
+        height: 20px;
+        position: absolute;
+        display: block;
+        margin-top: 15px;
+    }
 </style>
 <th:block th:replace="~{/layout/commons :: setContent(~{this :: content})}">
     <th:block th:fragment="content">
@@ -180,6 +187,17 @@
                         }
                     }
                 }
+                $.ajax({
+                    url: 'dateList.do',
+                    type: 'post',
+                    data: {'target_date': `${viewYear}-${(viewMonth + 1) >= 10 ? (viewMonth + 1) : '0' + (viewMonth + 1)}`},
+                    success: (result) => {
+                        let dateList = JSON.parse(result);
+                        for(let i = 0; i < dateList.length; i++) {
+                            $('.' + dateList[i].date).append('<img class="met" src="images/heart.png">');
+                        }
+                    }
+                })
             }
 
             const prevMonth = () => {

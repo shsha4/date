@@ -32,6 +32,6 @@ spring:
 ---
 
 mybatis:
-  type-aliases-package: com.mat.date.model
+  type-aliases-package: com.local.date.model
   mapper-locations: mybatis/**/*Mapper.xml
 ---
