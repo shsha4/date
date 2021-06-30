@@ -40,4 +40,16 @@
         SELECT * FROM schedule
         WHERE date LIKE CONCAT(#{target_date}, '%');
     </select>
+    <select id="getSchedule" parameterType="String" resultType="ScheduleDTO">
+        SELECT * FROM schedule
+        WHERE date = #{target_date};
+    </select>
+    <select id="getCategory" parameterType="int" resultType="String">
+        SELECT mc.category_name FROM plural_category a LEFT JOIN m_category mc on a.category_id = mc.category_id
+        WHERE idx = #{idx};
+    </select>
+    <select id="getPictures" parameterType="int" resultType="String">
+        SELECT picture FROM pictures
+        WHERE idx = #{idx};
+    </select>
 </mapper>

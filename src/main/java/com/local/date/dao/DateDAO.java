@@ -16,4 +16,7 @@ public interface DateDAO {
     boolean insertCategories(ScheduleDTO dto);
     int getIndexSchedule(ScheduleDTO dto);
     List<ScheduleDTO> getDateList(String target_date);
+    ScheduleDTO getSchedule(String target_date);
+    List<String> getCategory(int idx);
+    List<String> getPictures(int idx);
 }

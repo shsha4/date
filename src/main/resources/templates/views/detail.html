@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="kr" xmlns:th="http://www.thymeleaf.org">
+<title>Date :: 확인</title>
+<th:block th:replace="~{layout/commons :: setContent(~{this :: content})}">
+    <th:block th:fragment="content">
+        <div class="main container">
+            <input type="text" class="form-control" th:value="${schedule.getDate()}">
+            <input type="text" class="form-control" th:value="${schedule.getMemo()}">
+            <input type="text" class="form-control" th:value="${schedule.getPlace()}">
+            <img th:each="picture : ${schedule.getImgs()}" th:src="@{/img/Date/{picture}(picture=${picture})}" width="300px" height="300px">
+        </div>
+
+
+        <script th:inline="javascript">
+            let schedule = /*[[${schedule}]]*/ '';
+            console.log(schedule);
+        </script>
+    </th:block>
+</th:block>
+</html>

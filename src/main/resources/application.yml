@@ -24,6 +24,7 @@ spring:
   thymeleaf:
     cache: false
 
+
   servlet:
     multipart:
       max-file-size: 10MB

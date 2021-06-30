@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @RestController
@@ -38,7 +37,7 @@ public class DateRestController {
             Arrays.stream(files).forEach(file -> {
                 String uuid = UUID.randomUUID().toString().replace("-", "");
                 String fileDate = dto.getDate().replace("-", "");
-                String originalFileName = fileDate + "_" + dto.getPlace() + "_" + uuid + ".jpeg";
+                String originalFileName = fileDate + "_" + uuid + ".jpeg";
                 imgs.add(originalFileName);
 
                 try {

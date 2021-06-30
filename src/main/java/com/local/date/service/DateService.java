@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -40,5 +41,14 @@ public class DateService {
     public List<ScheduleDTO> getDateList(String target_date) {
         List<ScheduleDTO> dto = dao.getDateList(target_date);
         return dto;
+    }
+
+    public Optional<ScheduleDTO> getSchedule(String target_date) {
+        Optional<ScheduleDTO> schedule = Optional.ofNullable(dao.getSchedule(target_date));
+        if (schedule.isPresent()) {
+            schedule.get().setImgs(dao.getPictures(schedule.get().getIdx()));
+            schedule.get().setCategories(dao.getCategory(schedule.get().getIdx()));
+        }
+        return schedule;
     }
 }
