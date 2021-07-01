@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="kr" xmlns:th="http://www.thymeleaf.org">
+<title>Date :: 지도</title>
+<th:block th:replace="~{layout/commons :: setContent(~{this :: content})}">
+    <th:block th:fragment="content">
+        <div class="main">
+            <div id="map"></div>
+            <button class="btn btn-lg btn-info" onclick="location.href='index'" style="z-index: 5; position: absolute; bottom: 1%; right: 3%;">
+                <i class="fa fa-calendar" aria-hidden="true"></i> 달력</button>
+        </div>
+        <script src="js/initmap.js"></script>
+        <script th:inline="javascript">
+            $(() => {
+                $('#map').width(window.innerWidth || document.body.clientWidth);
+                $('#map').height(window.innerHeight || document.body.clientHeight);
+
+               initMap(37.5666805, 126.9784147);
+               map.setLevel(13);
+            });
+        </script>
+    </th:block>
+</th:block>
+</html>

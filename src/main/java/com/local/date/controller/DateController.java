@@ -48,4 +48,9 @@ public class DateController {
         model.addAttribute("schedule", schedule.orElseGet(null));
         return "views/detail";
     }
+
+    @GetMapping("nationMap")
+    public String nationMap() {
+        return "views/nationMap";
+    }
 }

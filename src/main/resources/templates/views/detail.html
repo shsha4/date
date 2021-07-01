@@ -14,7 +14,7 @@
         display: flex;
         flex-direction: row;
         font-size: 12px;
-        justify-content: space-between;
+        justify-content: space-evenly;
         color: #0cc1dd;
     }
 </style>
@@ -33,7 +33,11 @@
                 <li th:each="category : ${schedule.getCategories()}" th:text="${'#' + category}"></li>
             </ul>
             <label>메모</label>
-            <textarea class="form-control" rows="3" readonly th:value="${schedule.getMemo()}"></textarea>
+            <textarea class="form-control" rows="3" th:text="${schedule.getMemo()}" readonly></textarea>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn btn-lg btn-info" onclick="location.href='index'"><i class="fa fa-calendar" aria-hidden="true"></i> 달력</button>
+                <button class="btn btn-lg btn-success" onclick="location.href='nationMap'"><i class="fa fa-map" aria-hidden="true"></i> 지도</button>
+            </div>
         </div>
         <div class="modal fade" id="placeModal" role="dialog">
             <div class="modal-dialog">

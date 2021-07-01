@@ -12,7 +12,7 @@
         align-items: center;
     }
     .year-month {
-        font-size: 35px;
+        font-size: 30px;
     }
     .nav {
         display: flex;
@@ -20,7 +20,7 @@
         border-radius: 5px;
     }
     .nav-btn {
-        width: 28px;
+        width: 40px;
         height: 30px;
         border: none;
         font-size: 16px;
@@ -32,6 +32,8 @@
         width: 75px;
         border-left: 1px solid #333333;
         border-right: 1px solid #333333;
+        background-color: #FF0000;
+        color: #FFFFFF;
     }
     .days {
         display: flex;
@@ -113,6 +115,9 @@
                     <div class="day">SAT</div>
                 </div>
                 <div class="dates"></div>
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn btn-lg btn-success" style="width: 100%;" onclick="location.href='nationMap'"><i class="fa fa-map" aria-hidden="true"></i> 지도</button>
             </div>
         </div>
         <script>
