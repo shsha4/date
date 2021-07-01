@@ -29,10 +29,10 @@ public class DateService {
         if(result) {
             dto.setIdx(dao.getIndexSchedule(dto));
         }
-        if(dto.getIdx() > 0 && !dto.getImgs().isEmpty()) {
+        if(dto.getIdx() > 0 && dto.getImgs() != null) {
             result = dao.insertPictures(dto);
         }
-        if(result && !dto.getCategories().isEmpty()) {
+        if(result && dto.getCategories() != null) {
             result = dao.insertCategories(dto);
         }
         return result;
@@ -50,5 +50,10 @@ public class DateService {
             schedule.get().setCategories(dao.getCategory(schedule.get().getIdx()));
         }
         return schedule;
+    }
+
+    public boolean delPicture(String picture) {
+        boolean result = dao.delPicture(picture);
+        return result;
     }
 }

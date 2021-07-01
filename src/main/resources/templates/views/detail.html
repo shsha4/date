@@ -1,19 +1,187 @@
 <!DOCTYPE html>
 <html lang="kr" xmlns:th="http://www.thymeleaf.org">
 <title>Date :: 확인</title>
+<style>
+    label {
+        margin-top: 0.5rem;
+    }
+    .carousel-inner img {
+        width: 100% !important;
+        height: 100% !important;
+    }
+    .categories {
+        list-style-type: none;
+        display: flex;
+        flex-direction: row;
+        font-size: 12px;
+        justify-content: space-between;
+        color: #0cc1dd;
+    }
+</style>
 <th:block th:replace="~{layout/commons :: setContent(~{this :: content})}">
     <th:block th:fragment="content">
         <div class="main container">
-            <input type="text" class="form-control" th:value="${schedule.getDate()}">
-            <input type="text" class="form-control" th:value="${schedule.getMemo()}">
-            <input type="text" class="form-control" th:value="${schedule.getPlace()}">
-            <img th:each="picture : ${schedule.getImgs()}" th:src="@{/img/Date/{picture}(picture=${picture})}" width="300px" height="300px">
+            <label>만난날짜</label>
+            <input type="text" class="form-control" th:value="${schedule.getDate()}" readonly>
+            <label>만난곳</label>
+            <input type="text" class="form-control" th:value="${schedule.getPlace()}" readonly>
+            <button class="btn btn-lg btn-info pictures" style="margin-top: 10px; width: 100%;"><i class="fa fa-picture-o" aria-hidden="true"></i> <span></span></button>
+            <div id="mapmask" style="position: absolute; margin-top: 15px; z-index: 5;"></div>
+            <div id="map" style="width: 100%; height: 200px; margin-top: 15px;"></div>
+            <label>카테고리</label>
+            <ul class="categories">
+                <li th:each="category : ${schedule.getCategories()}" th:text="${'#' + category}"></li>
+            </ul>
+            <label>메모</label>
+            <textarea class="form-control" rows="3" readonly th:value="${schedule.getMemo()}"></textarea>
         </div>
-
-
+        <div class="modal fade" id="placeModal" role="dialog">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <span>사진첩</span>
+                        <button type="button" class="close" data-dismiss="modal">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="select_img" class="carousel slide form-group" data-interval="false"
+                             style="display: none;">
+                            <!-- Indicators -->
+                            <ol class="carousel-indicators"></ol>
+                            <!-- Wrapper for slides -->
+                            <div class="carousel-inner" role="listbox"></div>
+                            <!-- Controls -->
+                            <a class="carousel-control-prev" href="#select_img" data-slide="prev">
+                                <span class="carousel-control-prev-icon"></span>
+                            </a>
+                            <a class="carousel-control-next" href="#select_img" data-slide="next">
+                                <span class="carousel-control-next-icon"></span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="display: block;">
+                        <div id="imgsArea">
+                            <label>기존 등록 사진</label>
+                            <ul class="list-group" style="margin: 5px;">
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="js/initmap.js"></script>
         <script th:inline="javascript">
-            let schedule = /*[[${schedule}]]*/ '';
-            console.log(schedule);
+
+            let imgs = [];
+
+            $(() => {
+
+                $('#mapmask').width($('#map').width());
+                $('#mapmask').height($('#map').height());
+                $('#mapmask').on('click', () => {
+                    $('#mapmask').hide();
+                });
+
+                $('.pictures').on('click', () => {
+                    $('.modal').modal();
+                });
+
+                let schedule = /*[[${schedule}]]*/ '';
+
+                initMap(schedule.date_lat, schedule.date_lon);
+
+                let markerPostion = new kakao.maps.LatLng(schedule.date_lat, schedule.date_lon);
+                marker = new kakao.maps.Marker({
+                    position: markerPostion,
+                    image: markerImage
+                });
+                marker.setMap(map);
+
+                let getPictures = schedule.imgs;
+
+                if (getPictures.length > 0) {
+                    getPictures.forEach(item => {
+                        imgs.push('/img/Date/' + item);
+                    });
+                }
+                select_imgs();
+
+                //기존 이미지 목록 삭제 버튼을 눌렀을시
+                $('#imgsArea').on('click', ' button', function (e) {
+                    e.preventDefault();
+                    //부모 요소를 선택하여 인덱스를 찾고 클릭시 배열 지우기
+                    let cnt = $(this).closest('li').html().substr(2, 1) - 1;
+
+                    let conf = confirm("해당 사진을 삭제 하시겠습니까?");
+
+                    if (conf) {
+                        let delImg = getPictures[cnt];
+                        imgs.splice(cnt, 1);
+                        getPictures.splice(cnt, 1);
+
+                        $.ajax({
+                            type: "post",
+                            url: "deletePicture.do",
+                            data: {picture: delImg},
+                            success: function (result) {
+                                console.log(result);
+                            }
+                        });
+                        $('#imgsArea ul').empty();
+                        select_imgs();
+                    } else {
+                        return;
+                    }
+                });
+
+                $('.carousel-control-prev').on('click', () => {
+                    setTimeout(carouselIdxChk, 500);
+                });
+                $('.carousel-control-next').on('click', () => {
+                    setTimeout(carouselIdxChk, 500);
+                });
+
+            });
+
+            function select_imgs() {
+                $('.carousel-inner').empty();
+                $('.carousel-indicators').empty();
+                $('#imgsArea ul').empty();
+                if (imgs.length > 0) {
+                    $('#select_img').show();
+                } else {
+                    $('#select_img').hide();
+                }
+
+                if (imgs.length > 0) {
+                    $('#imgsArea').show();
+                    for (let i = 0; i < imgs.length; i++) {
+                        $('#imgsArea ul').append("<li class='list-group-item' style='font-size: 12px;' data-slide-to=\"" + i + "\">사진" + (i + 1) + "<button class='btn btn-danger btn-sm' style='margin-left:65%;'>삭제</button></li>");
+                    }
+                } else {
+                    $('#imgsArea').hide();
+                }
+                for (let i = 0; i < imgs.length; i++) {
+                    $('<div class=\"carousel-item\"><img src="' + imgs[i] + '" tabindex="0"></div>').appendTo('.carousel-inner');
+                    $('<li data-target="#upload_img" data-slide-to="' + i + '"></li>').appendTo('.carousel-indicators');
+                }
+
+                $('.carousel-item').last().addClass('active');
+                $('.carousel-indicators > li').last().addClass('active');
+                $('.list-group-item').last().addClass('active');
+                $('.pictures span').text('사진첩 (' + imgs.length +')');
+                $('#select_img').carousel();
+            }
+
+            function carouselIdxChk() {
+                $('.list-group-item').each(function () {
+                    if ($('.carousel-indicators > .active').attr('data-slide-to') === $(this).attr('data-slide-to')) {
+                        $(this).addClass('active');
+                    } else {
+                        $(this).removeClass('active');
+                    }
+                });
+            }
         </script>
     </th:block>
 </th:block>

@@ -19,4 +19,5 @@ public interface DateDAO {
     ScheduleDTO getSchedule(String target_date);
     List<String> getCategory(int idx);
     List<String> getPictures(int idx);
+    boolean delPicture(String picture);
 }

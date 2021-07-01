@@ -52,4 +52,8 @@
         SELECT picture FROM pictures
         WHERE idx = #{idx};
     </select>
+    <delete id="delPicture" parameterType="String">
+        DELETE FROM pictures
+        WHERE picture = #{picture};
+    </delete>
 </mapper>

@@ -30,9 +30,8 @@ public class DateRestController {
     private ObjectMapper objectMapper = new ObjectMapper();
 
     @PostMapping("insert.do")
-    public ResponseEntity<Boolean> insertAction(@ModelAttribute ScheduleDTO dto, MultipartFile files[]) {
-
-        if (Arrays.stream(files).allMatch(Objects::nonNull)) {
+    public ResponseEntity<Boolean> insertAction(@ModelAttribute ScheduleDTO dto, MultipartFile[] files) {
+        if (files != null) {
             List<String> imgs = new ArrayList<>();
             Arrays.stream(files).forEach(file -> {
                 String uuid = UUID.randomUUID().toString().replace("-", "");
@@ -51,7 +50,7 @@ public class DateRestController {
 
         boolean result = service.insertSchedule(dto);
 
-        return new ResponseEntity<Boolean>(result, HttpStatus.OK);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
     @PostMapping("dateList.do")
     public ResponseEntity<String> dateListAction(@RequestParam("target_date") String target_date) {
@@ -63,5 +62,11 @@ public class DateRestController {
             log.error(e);
         }
         return new ResponseEntity<>(dateListJson, HttpStatus.OK);
+    }
+
+    @PostMapping("deletePicture.do")
+    public ResponseEntity<Boolean> delPictureAction(@RequestParam("picture") String picture) {
+        log.info(picture);
+        return new ResponseEntity<>(service.delPicture(picture), HttpStatus.OK);
     }
 }

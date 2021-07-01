@@ -8,7 +8,7 @@
     .tag {
         font-size: 11px;
         margin: 5px;
-        color: #2086f4;
+        color: #0cc1dd;
         display: flex;
         flex-direction: column;
         display: none;
@@ -107,18 +107,14 @@
                 <button class="btn btn-lg btn-success insertBtn"><i class="fa fa-check-circle"></i> 등록</button>
             </div>
         </div>
+        <script src="js/initmap.js"></script>
         <script>
-            let places;
+            // let places;
             let file = [];
             let resizeImage = [];
 
             $(() => {
-                let lat;
-                let lon;
-                let map;
-                let ps;
-                let marker;
-                let markerImage = new kakao.maps.MarkerImage('images/marker.png', new kakao.maps.Size(24, 24));
+                initMap();
 
                 $('#mapmask').width($('#map').width());
                 $('#mapmask').height($('#map').height());
@@ -144,27 +140,6 @@
                         $('#upload_img').trigger('change');
                     }
                 });
-
-                if (!!navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
-                }
-
-                function errorCallback(err) {
-                    alert(err + '\n이 브라우저는 Geolocation을 지원하지 않습니다');
-                    return location.href = 'index';
-                }
-
-                function successCallback(position) {
-                    lat = !!lat ? lat : position.coords.latitude;
-                    lon = !!lon ? lon : position.coords.longitude;
-
-                    let mapContainer = document.getElementById('map'),
-                        mapOption = {
-                            center: new kakao.maps.LatLng(lat, lon)
-                        };
-                    map = new kakao.maps.Map(mapContainer, mapOption);
-                    ps = new kakao.maps.services.Places();
-                }
 
                 $('#categoryBtn').on('click', function () {
                     if ($(this).text() === '▲') {
@@ -251,9 +226,8 @@
 
                     if($('input[name=place]').val() != '') {
                         let formData = new FormData($('.mainForm')[0]);
-                        let categories = [];
 
-                        if (resizeImage != null) {
+                        if (resizeImage.length > 0) {
                             resizeImage.forEach((img) => {
                                 formData.append('files', img);
                             });
@@ -267,7 +241,10 @@
                             contentType: false,
                             success : (result) => {
                                 if(result) {
+                                    alert('등록 성공');
                                     location.href = 'index';
+                                } else {
+                                    alert('등록 실패');
                                 }
                             }
                         });
