@@ -1,6 +1,72 @@
 <!DOCTYPE html>
 <html lang="kr" xmlns:th="http://www.thymeleaf.org">
 <title>Date :: 지도</title>
+<style>
+    .popup-overlay.show {
+        display: block;
+    }
+    .type-date {
+        width: 170px;
+    }
+    .type-date .head-title {
+        background-color: #404040;
+    }
+    .popup-overlay .head-title {
+        width: 100%;
+        height: 30px;
+        border-radius: 10px 10px 0 0;
+        position: relative;
+        color: #fff;
+        font-size: 15px;
+        text-align: center;
+        padding-top: 5px;
+    }
+    .popup-overlay {
+        display: none;
+        position: absolute;
+
+        top: -50px;
+        left: 50%;
+        transform: translate(-50%, -100%);
+        box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.16);
+        border-radius: 10px;
+        background-color: #fff;
+        z-index: 3;
+    }
+    .popup-overlay:before {
+        content: '';
+        border: none;
+        border-top: 20px solid #fff;
+        border-left: 13px solid transparent;
+        border-right: 13px solid transparent;
+        position: absolute;
+        left: calc(50% - 13px);
+        bottom: -18px;
+    }
+    .type-rtu ul li div {
+        width: 42%;
+    }
+    .popup-overlay ul li div {
+        line-height: 23px;
+        color: #404040;
+        text-align: center;
+    }
+    .type-rtu ul {
+        margin-bottom: 15px;
+    }
+    .popup-overlay ul {
+        margin-top: 12px;
+        padding: 0 15px;
+    }
+    ul, li {
+        list-style-type: none;
+    }
+    .overlay-close {
+        position: absolute;
+        right: 10px;
+        color: #ff7878;
+    }
+</style>
 <th:block th:replace="~{layout/commons :: setContent(~{this :: content})}">
     <th:block th:fragment="content">
         <div class="main">
@@ -16,6 +82,81 @@
 
                initMap(37.5666805, 126.9784147);
                map.setLevel(13);
+
+               let schList = /*[[${list}]]*/ '';
+               let markers = [];
+
+               if(schList != '') {
+                   schList.forEach((sch, idx) => {
+                       let position = new kakao.maps.LatLng(sch.date_lat, sch.date_lon);
+                       markers[idx] = new kakao.maps.Marker({
+                           position: position,
+                           image: markerImage
+                       });
+                       markers[idx].setMap(map);
+
+                       //marker 클릭이벤트 overlay 구성
+                       kakao.maps.event.addListener(markers[idx], 'click', function () {
+
+                           if (!!markers[idx].overlay) {
+                               markers[idx].overlay.setMap(null);
+                           }
+
+                           let content = document.createElement('div');
+                           content.className = 'popup-overlay type-date show';
+                           let overlayPosition;
+
+                           let div = document.createElement('div');
+                           div.className = 'head-title';
+                           let span = document.createElement('span');
+                           span.className = 'bold';
+                           let close = document.createElement('span');
+                           close.className = 'overlay-close';
+                           close.onclick = () => {markers[idx].overlay.setMap(null);};
+
+                           span.appendChild(document.createTextNode(sch.date));
+                           close.appendChild(document.createTextNode('X'));
+                           div.appendChild(span);
+                           div.appendChild(close);
+
+                           content.appendChild(div);
+
+                           let ul = document.createElement('ul');
+                           let info_li = document.createElement('li');
+                           let info_li_div = document.createElement('div');
+                           info_li.appendChild(info_li_div);
+                           let info_li_span = document.createElement('span');
+                           info_li_span.appendChild(document.createTextNode(sch.place));
+                           info_li_div.appendChild(info_li_span);
+                           ul.appendChild(info_li);
+                           let info_li2 = document.createElement('li');
+                           let info_li_btn = document.createElement('btn');
+                           info_li_btn.style.width = '100%';
+                           info_li_btn.style.marginTop = '5px';
+                           info_li_btn.className = 'btn btn-sm btn-secondary';
+                           info_li_btn.innerHTML = '<i class="fa fa-heart" aria-hidden="true"></i>';
+                           info_li_btn.onclick = () => {location.href = 'detail?date=' + sch.date};
+
+                           info_li2.appendChild(info_li_btn);
+                           ul.appendChild(info_li2);
+
+                           overlayPosition = markers[idx].getPosition();
+                           content.appendChild(ul);
+
+                           // create overlay
+                           let overlay = new kakao.maps.CustomOverlay({
+                               position: overlayPosition,
+                               content: content
+                           });
+
+                           markers[idx].overlay = overlay;
+                           markers[idx].overlay.setMap(map);
+
+                           map.setLevel(4);
+                           map.setCenter(overlayPosition);
+                       });
+                   });
+               }
             });
         </script>
     </th:block>

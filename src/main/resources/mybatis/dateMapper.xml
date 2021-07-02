@@ -56,4 +56,7 @@
         DELETE FROM pictures
         WHERE picture = #{picture};
     </delete>
+    <select id="getScheduleList" resultType="ScheduleDTO">
+        SELECT * FROM schedule;
+    </select>
 </mapper>

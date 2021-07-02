@@ -39,6 +39,9 @@
 </style>
 <th:block th:replace="~{layout/commons :: setContent(~{this :: content})}">
     <th:block th:fragment="content">
+        <div id="mask" style="background-color: #333333; opacity: 0.4;  position: fixed; z-index: 5; text-align: center; display: none;">
+            <img src="images/Loading.gif" style="width: 50px; height: 50px; top: 50%; position: relative;">
+        </div>
         <div class="main container">
             <form class="mainForm" enctype="multipart/form-data">
                 <label>날짜</label>
@@ -115,6 +118,9 @@
 
             $(() => {
                 initMap();
+
+                $('#mask').width(window.innerWidth || document.body.clientWidth);
+                $('#mask').height(window.innerHeight || document.body.clientHeight);
 
                 $('#mapmask').width($('#map').width());
                 $('#mapmask').height($('#map').height());
@@ -246,6 +252,17 @@
                                 } else {
                                     alert('등록 실패');
                                 }
+                            },
+                            beforeSend: function() {
+                                $('#mask').show();
+                                $('#mask').on('scroll touchmove mousewheel', function(e) {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    return false;
+                                });
+                            },
+                            complete: function() {
+                                $('#mask').hide();
                             }
                         });
                     } else {

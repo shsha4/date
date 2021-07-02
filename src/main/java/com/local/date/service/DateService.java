@@ -7,9 +7,8 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import javax.swing.text.html.Option;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -55,5 +54,10 @@ public class DateService {
     public boolean delPicture(String picture) {
         boolean result = dao.delPicture(picture);
         return result;
+    }
+
+    public List<ScheduleDTO> getScheduleList() {
+        Optional<List<ScheduleDTO>> list = Optional.ofNullable(dao.getScheduleList());
+        return list.orElseGet(null);
     }
 }

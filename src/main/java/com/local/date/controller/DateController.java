@@ -50,7 +50,9 @@ public class DateController {
     }
 
     @GetMapping("nationMap")
-    public String nationMap() {
+    public String nationMap(Model model) {
+        List<ScheduleDTO> list = service.getScheduleList();
+        model.addAttribute("list", list);
         return "views/nationMap";
     }
 }
