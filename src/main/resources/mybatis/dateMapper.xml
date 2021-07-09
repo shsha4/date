@@ -6,31 +6,31 @@
     </select>
     <insert id="insertSchedule" parameterType="ScheduleDTO">
         INSERT INTO
-            schedule(
-                     date,
-                     place,
-                     date_lat,
-                     date_lon,
-                     memo)
-            VALUE(
-                #{date},
-                #{place},
-                #{date_lat},
-                #{date_lon},
-                #{memo}
-            );
+        schedule(
+        date,
+        place,
+        date_lat,
+        date_lon,
+        memo)
+        VALUE(
+        #{date},
+        #{place},
+        #{date_lat},
+        #{date_lon},
+        #{memo}
+        );
     </insert>
     <insert id="insertPictures" parameterType="ScheduleDTO">
         INSERT INTO
-            pictures(idx, picture, upload_date)
+        pictures(idx, picture, upload_date)
         VALUES
-            <foreach collection="imgs" item="item" separator=",">(#{idx}, #{item}, now())</foreach>;
+        <foreach collection="imgs" item="item" separator=",">(#{idx}, #{item}, now())</foreach>;
     </insert>
     <insert id="insertCategories" parameterType="ScheduleDTO">
         INSERT INTO
-            plural_category(idx, category_id)
+        plural_category(idx, category_id)
         VALUES
-            <foreach collection="categories" item="item" separator=",">(#{idx}, #{item})</foreach>;
+        <foreach collection="categories" item="item" separator=",">(#{idx}, #{item})</foreach>;
     </insert>
     <select id="getIndexSchedule" parameterType="ScheduleDTO" resultType="int">
         SELECT idx FROM schedule
@@ -59,4 +59,8 @@
     <select id="getScheduleList" resultType="ScheduleDTO">
         SELECT * FROM schedule;
     </select>
+    <delete id="delSchedule" parameterType="int">
+        DELETE FROM schedule
+        WHERE idx = #{idx};
+    </delete>
 </mapper>

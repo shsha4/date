@@ -10,10 +10,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
@@ -68,5 +65,12 @@ public class DateRestController {
     public ResponseEntity<Boolean> delPictureAction(@RequestParam("picture") String picture) {
         log.info(picture);
         return new ResponseEntity<>(service.delPicture(picture), HttpStatus.OK);
+    }
+
+    @PostMapping("deleteAction.do")
+    public ResponseEntity<Boolean> delAction(@RequestParam("idx") int idx) {
+        log.info("{}", "Delete : " + idx);
+        boolean result = service.delSchedule(idx);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }

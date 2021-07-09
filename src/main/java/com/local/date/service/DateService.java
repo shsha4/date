@@ -60,4 +60,8 @@ public class DateService {
         Optional<List<ScheduleDTO>> list = Optional.ofNullable(dao.getScheduleList());
         return list.orElseGet(null);
     }
+
+    public boolean delSchedule(int idx) {
+        return dao.delSchedule(idx);
+    }
 }
