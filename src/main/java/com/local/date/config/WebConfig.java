@@ -14,8 +14,8 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/img/**/")
-                .addResourceLocations("file:///" + uploadPath + "/") // Windows 경로
-//                .addResourceLocations("file:" + uploadPath + "/") // Linux 경로
+//                .addResourceLocations("file:///" + uploadPath + "/") // Windows 경로
+                .addResourceLocations("file:" + uploadPath + "/") // Linux 경로
                 .setCachePeriod(3600)
                 .resourceChain(true)
                 .addResolver(new PathResourceResolver());
